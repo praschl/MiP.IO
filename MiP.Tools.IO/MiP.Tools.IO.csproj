@@ -35,6 +35,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectoryCopy.cs" />
+    <Compile Include="DirectoryCopyCompleteEventArgs.cs" />
     <Compile Include="File.cs" />
     <Compile Include="FileCopy.cs" />
     <Compile Include="FileCopyCompleteEventArgs.cs" />

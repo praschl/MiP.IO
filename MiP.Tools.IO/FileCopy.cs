@@ -8,11 +8,17 @@ namespace MiP.Tools.IO
     public class FileCopy
     {
         private readonly int _bufferSize;
+        
+        // TODO: overwrite flag
+
+        public FileCopy() : this(0x1000)
+        {
+        }
 
         public FileCopy(int bufferSize)
         {
             if (bufferSize<0x1000)
-                throw new ArgumentOutOfRangeException(nameof(bufferSize), "Buffer sizes lower than 0x1000 hurt performance.");
+                throw new ArgumentOutOfRangeException(nameof(bufferSize), "Buffer sizes lower than 0x1000 should not be used for performance reasons.");
 
             _bufferSize = bufferSize;
         }
@@ -22,14 +28,19 @@ namespace MiP.Tools.IO
 
         public async Task CopyAsync(string sourceFile, string destinationFile, CancellationToken cancellationToken)
         {
+            await CopyAsync(new FileInfo(sourceFile), new FileInfo(destinationFile), cancellationToken);
+        }
+
+        public async Task CopyAsync(FileInfo sourceFile, FileInfo destinationFile, CancellationToken cancellationToken)
+        {
             var buffer = new byte[_bufferSize];
 
             try
             {
-                using (var sourceStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read))
+                using (var sourceStream = sourceFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     var fileLength = sourceStream.Length;
-                    using (var destinationStream = new FileStream(destinationFile, FileMode.CreateNew, FileAccess.Write))
+                    using (var destinationStream = destinationFile.Open(FileMode.CreateNew, FileAccess.Write, FileShare.Write))
                     {
                         long bytesWritten = 0;
 
@@ -43,30 +54,24 @@ namespace MiP.Tools.IO
                             cancellationToken.ThrowIfCancellationRequested();
 
                             bytesWritten += blockSize;
-                            var percent = bytesWritten*100.0/fileLength;
+                            var percent = bytesWritten * 100.0 / fileLength;
 
                             var eventargs = new FileCopyProgressChangedEventArgs(percent);
                             ProgressChanged?.Invoke(this, eventargs);
                         }
                     }
                 }
+                Complete?.Invoke(this, new FileCopyCompleteEventArgs(false));
             }
             catch (TaskCanceledException)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    DeleteFile(destinationFile);
-            }
-            finally
-            {
-                Complete?.Invoke(this, new FileCopyCompleteEventArgs(cancellationToken.IsCancellationRequested));
+                DeleteFile(destinationFile);
+                Complete?.Invoke(this, new FileCopyCompleteEventArgs(true));
             }
         }
 
-        private static void DeleteFile(string filename)
+        private static void DeleteFile(FileSystemInfo file)
         {
-            Console.WriteLine("Deleting file: "+filename);
-
-            var file = new FileInfo(filename);
             file.Delete();
         }
     }
