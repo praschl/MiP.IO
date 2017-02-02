@@ -42,6 +42,10 @@
     <Compile Include="FileCopyCompleteEventArgs.cs" />
     <Compile Include="FileCopyProgressChangedEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Win32\CopyFileCallback.cs" />
+    <Compile Include="Win32\CopyFileCallbackAction.cs" />
+    <Compile Include="Win32\CopyFileOptions.cs" />
+    <Compile Include="Win32\FileRoutines.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
