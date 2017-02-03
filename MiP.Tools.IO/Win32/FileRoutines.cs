@@ -13,32 +13,34 @@ namespace MiP.Tools.IO.Win32
     // TODO: thread safety of CopyFileEx ?
     // TODO: make async
     // TODO: cancellation token
-    public sealed class FileRoutines
+
+    public class FileRoutines
     {
+        // TODO: event is here :-) willkommen zurück vom urlaub
+        public event EventHandler<CopyFileEventArgs> CopyFileProgressChanged;
+
         public static void CopyFile(FileInfo source, FileInfo destination, 
             CopyFileOptions options, CopyFileCallback callback)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
             if (destination == null) 
                 throw new ArgumentNullException(nameof(destination));
-            if ((options & ~CopyFileOptions.All) != 0) 
+            if ((options & ~CopyFileOptions.All) != 0) // if any bit in options is set which is not defined by CopyFileOptions
                 throw new ArgumentOutOfRangeException(nameof(options));
 
-            new FileIOPermission(
-                FileIOPermissionAccess.Read, source.FullName).Demand();
-            new FileIOPermission(
-                FileIOPermissionAccess.Write, destination.FullName).Demand();
+            new FileIOPermission(FileIOPermissionAccess.Read, source.FullName).Demand();
+            new FileIOPermission(FileIOPermissionAccess.Write, destination.FullName).Demand();
 
-            CopyProgressRoutine cpr = callback == null ? 
-                null : new CopyProgressRoutine(new CopyProgressData(
-                    source, destination, callback).CallbackHandler);
+            CopyProgressRoutine cpr;
+            if (callback != null)
+                cpr = new CopyProgressRoutine(new CopyProgressData(source, destination, callback).CallbackHandler);
+            else
+                cpr = null;
 
             bool cancel = false;
-            if (!CopyFileEx(source.FullName, destination.FullName, cpr, 
-                IntPtr.Zero, ref cancel, (int)options))
-            {
+            if (!CopyFileEx(source.FullName, destination.FullName, cpr, IntPtr.Zero, ref cancel, (int)options))
                 throw new IOException(new Win32Exception().Message);
-            }
         }
 
         private class CopyProgressData
@@ -77,5 +79,10 @@ namespace MiP.Tools.IO.Win32
             string lpExistingFileName, string lpNewFileName,
             CopyProgressRoutine lpProgressRoutine,
             IntPtr lpData, ref bool pbCancel, int dwCopyFlags);
+
+        private void OnCopyFileProgressChanged(CopyFileEventArgs e)
+        {
+            CopyFileProgressChanged?.Invoke(this, e);
+        }
     }
 }
