@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
 
-namespace MiP.Tools.IO.Win32
+namespace MiP.IO.Win32
 {
     // found at https://web.archive.org/web/20130304214632/http://msdn.microsoft.com/en-us/magazine/cc163851.aspx
 
@@ -34,7 +34,7 @@ namespace MiP.Tools.IO.Win32
 
             CopyProgressRoutine cpr;
             if (callback != null)
-                cpr = new CopyProgressRoutine(new CopyProgressData(source, destination, callback).CallbackHandler);
+                cpr = new CopyProgressData(source, destination, callback).CallbackHandler;
             else
                 cpr = null;
 

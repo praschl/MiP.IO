@@ -7,8 +7,8 @@
     <ProjectGuid>{E31E4AD6-D672-42B0-BBD5-2D67DDE2C69C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MiP.Tools.IO</RootNamespace>
-    <AssemblyName>MiP.Tools.IO</AssemblyName>
+    <RootNamespace>MiP.IO</RootNamespace>
+    <AssemblyName>MiP.IO</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -7,8 +7,8 @@
     <ProjectGuid>{F7FAE052-FBB9-4566-82E2-126121D1644B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MiP.Tools.IO.Test</RootNamespace>
-    <AssemblyName>MiP.Tools.IO.Test</AssemblyName>
+    <RootNamespace>MiP.IO.Test</RootNamespace>
+    <AssemblyName>MiP.IO.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -63,9 +63,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MiP.Tools.IO\MiP.Tools.IO.csproj">
+    <ProjectReference Include="..\MiP.IO\MiP.IO.csproj">
       <Project>{E31E4AD6-D672-42B0-BBD5-2D67DDE2C69C}</Project>
-      <Name>MiP.Tools.IO</Name>
+      <Name>MiP.IO</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

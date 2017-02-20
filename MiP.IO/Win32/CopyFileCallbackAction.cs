@@ -1,4 +1,4 @@
-namespace MiP.Tools.IO.Win32
+namespace MiP.IO.Win32
 {
     public enum CopyFileCallbackAction
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace MiP.Tools.IO.Win32
+namespace MiP.IO.Win32
 {
     [Flags]
     public enum CopyFileOptions

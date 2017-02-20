@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace MiP.Tools.IO
+namespace MiP.IO
 {
     public static class File
     {

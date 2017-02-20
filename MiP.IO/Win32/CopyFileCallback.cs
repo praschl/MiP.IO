@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace MiP.Tools.IO.Win32
+namespace MiP.IO.Win32
 {
     public delegate CopyFileCallbackAction CopyFileCallback(
         FileInfo source, FileInfo destination,

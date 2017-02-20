@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using F = System.IO.File;
 
-namespace MiP.Tools.IO.Test
+namespace MiP.IO.Test
 {
     [TestClass]
     public class FileCopyTest

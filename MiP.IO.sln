@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26127.0
+VisualStudioVersion = 15.0.26206.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiP.Tools.IO", "MiP.Tools.IO\MiP.Tools.IO.csproj", "{E31E4AD6-D672-42B0-BBD5-2D67DDE2C69C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiP.IO", "MiP.IO\MiP.IO.csproj", "{E31E4AD6-D672-42B0-BBD5-2D67DDE2C69C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiP.Tools.IO.Test", "MiP.Tools.IO.Test\MiP.Tools.IO.Test.csproj", "{F7FAE052-FBB9-4566-82E2-126121D1644B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiP.IO.Test", "MiP.IO.Test\MiP.IO.Test.csproj", "{F7FAE052-FBB9-4566-82E2-126121D1644B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

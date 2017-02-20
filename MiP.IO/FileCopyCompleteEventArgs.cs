@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MiP.Tools.IO
+namespace MiP.IO
 {
     public class FileCopyCompleteEventArgs : EventArgs
     {
