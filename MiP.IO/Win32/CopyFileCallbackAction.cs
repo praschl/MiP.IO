@@ -2,13 +2,24 @@ namespace MiP.IO.Win32
 {
     public enum CopyFileCallbackAction
     {
-        // continue normally
+        /// <summary>
+        /// Continue normally, or end a pause, paused by Stop().
+        /// </summary>
         Continue = 0,
-        // cancel an delete destination
+
+        /// <summary>
+        /// Cancel the delete action, the destination file is being removed (TODO: test if removed)
+        /// </summary>
         Cancel = 1,
-        // pause copying (end pause by continue)
+
+        /// <summary>
+        /// Pauses copying of the file until Continue() is called.
+        /// </summary>
         Stop = 2,
-        // continue, but dont call the callback anymore
+
+        /// <summary>
+        /// Continue copying, but dont call the event handler anymore.
+        /// </summary>
         Quiet = 3
     }
 }

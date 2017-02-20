@@ -9,22 +9,19 @@ namespace MiP.IO.Win32
 {
     // found at https://web.archive.org/web/20130304214632/http://msdn.microsoft.com/en-us/magazine/cc163851.aspx
 
-    // TODO: event instead of delegate callback, this means big refactoring
-    // TODO: thread safety of CopyFileEx ?
     // TODO: make async
     // TODO: cancellation token
 
     public class FileRoutines
     {
-        // TODO: event is here :-) willkommen zurück vom urlaub
         public event EventHandler<CopyFileEventArgs> CopyFileProgressChanged;
 
-        public static void CopyFile(FileInfo source, FileInfo destination, 
-            CopyFileOptions options, CopyFileCallback callback)
+        public void CopyFile(FileInfo source, FileInfo destination,
+            CopyFileOptions options)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
-            if (destination == null) 
+            if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
             if ((options & ~CopyFileOptions.All) != 0) // if any bit in options is set which is not defined by CopyFileOptions
                 throw new ArgumentOutOfRangeException(nameof(options));
@@ -33,56 +30,45 @@ namespace MiP.IO.Win32
             new FileIOPermission(FileIOPermissionAccess.Write, destination.FullName).Demand();
 
             CopyProgressRoutine cpr;
-            if (callback != null)
-                cpr = new CopyProgressData(source, destination, callback).CallbackHandler;
+            if (CopyFileProgressChanged != null)
+            {
+                var fileEventArgs = new CopyFileEventArgs(source, destination);
+
+                cpr = (totalFileSize, totalBytesTransferred,
+                        streamSize, streamBytesTransferred, streamNumber, callbackReason, sourceFile, destinationFile, data) =>
+                    {
+                        var copyFileEventArgs = fileEventArgs;
+                        copyFileEventArgs.TotalFileSize = totalFileSize;
+                        copyFileEventArgs.TotalBytesTransferred = totalBytesTransferred;
+
+                        OnCopyFileProgressChanged(copyFileEventArgs);
+
+                        return (int) fileEventArgs.CallbackAction;
+                    };
+            }
             else
                 cpr = null;
 
-            bool cancel = false;
-            if (!CopyFileEx(source.FullName, destination.FullName, cpr, IntPtr.Zero, ref cancel, (int)options))
+            var cancel = false;
+            if (!CopyFileEx(source.FullName, destination.FullName, cpr, IntPtr.Zero, ref cancel, (int) options))
                 throw new IOException(new Win32Exception().Message);
         }
-
-        private class CopyProgressData
-        {
-            private readonly FileInfo _source;
-            private readonly FileInfo _destination;
-            private readonly CopyFileCallback _callback;
-
-            public CopyProgressData(FileInfo source, FileInfo destination, 
-                CopyFileCallback callback)
-            {
-                _source = source; 
-                _destination = destination;
-                _callback = callback;
-            }
-
-            public int CallbackHandler(
-                long totalFileSize, long totalBytesTransferred, 
-                long streamSize, long streamBytesTransferred, 
-                int streamNumber, int callbackReason,
-                IntPtr sourceFile, IntPtr destinationFile, IntPtr data)
-            {
-                return (int)_callback(_source, _destination, 
-                    totalFileSize, totalBytesTransferred);
-            }
-        }
-
-        private delegate int CopyProgressRoutine(
-            long totalFileSize, long totalBytesTransferred, long streamSize, 
-            long streamBytesTransferred, int streamNumber, int callbackReason,
-            IntPtr sourceFile, IntPtr destinationFile, IntPtr data);
-        
-        [SuppressUnmanagedCodeSecurity]
-        [DllImport("Kernel32.dll", CharSet=CharSet.Auto, SetLastError=true)]
-        private static extern bool CopyFileEx(
-            string lpExistingFileName, string lpNewFileName,
-            CopyProgressRoutine lpProgressRoutine,
-            IntPtr lpData, ref bool pbCancel, int dwCopyFlags);
 
         private void OnCopyFileProgressChanged(CopyFileEventArgs e)
         {
             CopyFileProgressChanged?.Invoke(this, e);
         }
+
+        [SuppressUnmanagedCodeSecurity]
+        [DllImport("Kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool CopyFileEx(
+            string lpExistingFileName, string lpNewFileName,
+            CopyProgressRoutine lpProgressRoutine,
+            IntPtr lpData, ref bool pbCancel, int dwCopyFlags);
+
+        private delegate int CopyProgressRoutine(
+            long totalFileSize, long totalBytesTransferred, long streamSize,
+            long streamBytesTransferred, int streamNumber, int callbackReason,
+            IntPtr sourceFile, IntPtr destinationFile, IntPtr data);
     }
 }
