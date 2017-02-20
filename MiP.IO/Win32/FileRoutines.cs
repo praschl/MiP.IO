@@ -4,20 +4,21 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MiP.IO.Win32
 {
-    // found at https://web.archive.org/web/20130304214632/http://msdn.microsoft.com/en-us/magazine/cc163851.aspx
+    // originally found at https://web.archive.org/web/20130304214632/http://msdn.microsoft.com/en-us/magazine/cc163851.aspx
+    // refactored for events and async pattern.
 
-    // TODO: make async
-    // TODO: cancellation token
+    // TODO: Test
 
     public class FileRoutines
     {
         public event EventHandler<CopyFileEventArgs> CopyFileProgressChanged;
 
-        public void CopyFile(FileInfo source, FileInfo destination,
-            CopyFileOptions options)
+        public async Task CopyFileAsync(FileInfo source, FileInfo destination, CopyFileOptions options, CancellationToken cancellationToken)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -37,20 +38,32 @@ namespace MiP.IO.Win32
                 cpr = (totalFileSize, totalBytesTransferred,
                         streamSize, streamBytesTransferred, streamNumber, callbackReason, sourceFile, destinationFile, data) =>
                     {
-                        var copyFileEventArgs = fileEventArgs;
-                        copyFileEventArgs.TotalFileSize = totalFileSize;
-                        copyFileEventArgs.TotalBytesTransferred = totalBytesTransferred;
+                        try
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
 
-                        OnCopyFileProgressChanged(copyFileEventArgs);
+                            var copyFileEventArgs = fileEventArgs;
+                            copyFileEventArgs.TotalFileSize = totalFileSize;
+                            copyFileEventArgs.TotalBytesTransferred = totalBytesTransferred;
 
-                        return (int) fileEventArgs.CallbackAction;
+                            OnCopyFileProgressChanged(copyFileEventArgs);
+
+                            return (int) fileEventArgs.CallbackAction;
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return (int) CopyFileCallbackAction.Cancel;
+                        }
                     };
             }
             else
                 cpr = null;
 
             var cancel = false;
-            if (!CopyFileEx(source.FullName, destination.FullName, cpr, IntPtr.Zero, ref cancel, (int) options))
+            var copyFileExReszkt = await Task.Run(() =>
+                    CopyFileEx(source.FullName, destination.FullName, cpr, IntPtr.Zero, ref cancel, (int) options)).ConfigureAwait(false);
+
+            if (!copyFileExReszkt)
                 throw new IOException(new Win32Exception().Message);
         }
 

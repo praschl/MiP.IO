@@ -5,6 +5,7 @@ namespace MiP.IO.Win32
 {
     public class CopyFileEventArgs : EventArgs
     {
+        // TODO: Document 
         public CopyFileEventArgs(FileInfo source, FileInfo destination)
         {
             Source = source;
@@ -19,6 +20,16 @@ namespace MiP.IO.Win32
         public void Continue()
         {
             CallbackAction = CopyFileCallbackAction.Continue;
+        }
+
+        public void Pause()
+        {
+            CallbackAction = CopyFileCallbackAction.Stop;
+        }
+
+        public void Quiet()
+        {
+            CallbackAction = CopyFileCallbackAction.Quiet;
         }
 
         internal CopyFileCallbackAction CallbackAction { get; private set; }
