@@ -60,10 +60,10 @@ namespace MiP.IO.Win32
                 cpr = null;
 
             var cancel = false;
-            var copyFileExReszkt = await Task.Run(() =>
-                    CopyFileEx(source.FullName, destination.FullName, cpr, IntPtr.Zero, ref cancel, (int) options)).ConfigureAwait(false);
+            var copyFileExResult = await Task.Run(() =>
+                    CopyFileEx(source.FullName, destination.FullName, cpr, IntPtr.Zero, ref cancel, (int) options), cancellationToken).ConfigureAwait(false);
 
-            if (!copyFileExReszkt)
+            if (!copyFileExResult)
                 throw new IOException(new Win32Exception().Message);
         }
 
